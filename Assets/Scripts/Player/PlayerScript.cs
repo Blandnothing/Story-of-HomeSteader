@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -7,7 +9,9 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] float m_speed = 4.0f;
     [SerializeField] float m_jumpForce = 7.5f;
     [SerializeField] float m_rollForce = 6.0f;
-    [SerializeField] bool m_noBlood = false; 
+    [SerializeField] bool m_noBlood = false;
+    [SerializeField] Slider sliderHealth;
+    [SerializeField] TextMeshProUGUI textHealth;
 
     private Animator m_animator;
     private Rigidbody2D m_body2d;
@@ -23,6 +27,8 @@ public class PlayerScript : MonoBehaviour
     private float m_rollCurrentTime;
 
     private float inputX;
+    public float maxHealth=100;
+    float currentHealth;
 
 
     // Use this for initialization
@@ -31,6 +37,8 @@ public class PlayerScript : MonoBehaviour
         m_animator = GetComponent<Animator>();
         m_body2d = GetComponent<Rigidbody2D>();
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_HeroKnight>();
+        currentHealth = maxHealth;
+        textHealth.text = currentHealth.ToString() + "/" + maxHealth.ToString();
     }
 
     // Update is called once per frame
@@ -77,22 +85,14 @@ public class PlayerScript : MonoBehaviour
             m_facingDirection = -1;
         }
 
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            changeHealth(-10);
+        }
 
         // -- Handle Animations --
 
-        //Death
-        if (Input.GetKeyDown("e") && !m_rolling)
-        {
-            m_animator.SetBool("noBlood", m_noBlood);
-            m_animator.SetTrigger("Death");
-        }
-
-        //Hurt
-        else if (Input.GetKeyDown("q") && !m_rolling)
-            m_animator.SetTrigger("Hurt");
-
-        //Attack
-        else if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
+        if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
         {
             m_currentAttack++;
 
@@ -166,5 +166,19 @@ public class PlayerScript : MonoBehaviour
 
         //Set AirSpeed in animator
         m_animator.SetFloat("AirSpeedY", m_body2d.velocity.y);
+    }
+    public void changeHealth(float amount)
+    {
+        if (amount<0)
+        {
+            m_animator.SetTrigger("Hurt");
+        }
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+        if(currentHealth < 0)
+        {
+            m_animator.SetBool("noBlood", m_noBlood);
+            m_animator.SetTrigger("Death");
+        }sliderHealth.value = currentHealth/maxHealth;
+        textHealth.text=currentHealth.ToString()+"/"+maxHealth.ToString();
     }
 }
