@@ -7,6 +7,10 @@ public class BasePanel : MonoBehaviour
     protected bool isRemove=false;
     protected new string name;
 
+    protected virtual void Awake()
+    {
+
+    }
     public virtual void SetActive(bool active)
     {
         gameObject.SetActive(active);
@@ -21,5 +25,9 @@ public class BasePanel : MonoBehaviour
         isRemove = true;
         SetActive(false);
         Destroy(gameObject);
+        if (UIManager.Instance.panelDict.ContainsKey(name))
+        {
+            UIManager.Instance.panelDict.Remove(name);
+        }
     }
 }

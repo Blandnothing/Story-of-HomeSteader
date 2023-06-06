@@ -61,6 +61,10 @@ sysinfo.txt
 *.unitypackage
 *.app
 
+#添加的资源
+*.wav
+*.jpeg
+
 # Crashlytics generated file
 crashlytics-build.properties
 

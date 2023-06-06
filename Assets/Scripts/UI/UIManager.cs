@@ -1,32 +1,106 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-namespace UIFrameWork
-{
-    public class UIManager
-    {
-        private static UIManager instance;
-        public static UIManager Instance { get { if (instance == null) instance = new UIManager(); return instance; } }
-        private Dictionary<string, string> pathDict;
-        private UIManager()
-        {
-            InitDicts();
-        }
 
-        private void InitDicts()
+public class UIManager
+{
+    private static UIManager _instance;
+    private Transform _uiRoot;
+    //路径配置字典
+    private Dictionary<string, string> pathDict;
+    //预制件缓存字典
+    private Dictionary<string, GameObject> prefabDict;
+    //已打开界面的缓存字典
+    public Dictionary<string, BasePanel> panelDict;
+    public static UIManager Instance { get { if (_instance == null) _instance = new UIManager(); return _instance; } }
+    public Transform UIRoot
+    {
+        get
         {
-            pathDict = new Dictionary<string, string>()
+            if(_uiRoot == null)
             {
-                {UIConst.InventoryPanel,"Assets/Prefabs/UI/Inventory Panel.prefab" },
-                {UIConst.SettingsPanel,"Assets/Prefabs/UI/Settings Panel.prefab" }
-            };   
+                if (GameObject.Find("DontDestroyObject"))
+                {
+                    _uiRoot = GameObject.Find("DontDestroyObject").transform;
+                }
+                else
+                {
+                    _uiRoot = new GameObject("DontDestroyObject").transform;
+                }
+            }
+            return _uiRoot;
         }
     }
-
-    public class UIConst
+    private UIManager()
     {
-        public const string InventoryPanel = "InventoryPanel";
-        public const string SettingsPanel = "SsttingsPanel";
+        InitDicts();
+    }
+
+    private void InitDicts()
+    {
+        prefabDict = new Dictionary<string, GameObject>();
+        panelDict = new Dictionary<string, BasePanel>();
+
+        pathDict = new Dictionary<string, string>()
+        {
+            {UIConst.InventoryPanel,"UI/Inventory Panel" },
+            {UIConst.SettingsPanel,"UI/Settings Panel" }
+        };   
+    }
+    public BasePanel OpenPanel(string name)
+    {
+        BasePanel panel = null;
+        //检查界面是否已打开
+        if(panelDict.TryGetValue(name,out panel))
+        {
+            Debug.Log("界面已打开" + name);
+            return null;
+        }
+
+        string path = "";
+        //检查路径是否已配置
+        if(!pathDict.TryGetValue(name,out path))
+        {
+            Debug.Log("界面名称错误" + name);
+            return null;
+        }
+
+        GameObject panelPrefab = null;
+        //使用缓存预制件
+        if(!prefabDict.TryGetValue(name,out panelPrefab))
+        {
+            string realPath = "Prefabs/"+path;
+            panelPrefab = Resources.Load<GameObject>(realPath) as GameObject;
+            prefabDict.Add(name, panelPrefab);
+        }
+
+        //打开界面
+        GameObject panelObject = GameObject.Instantiate(panelPrefab, UIRoot, true);
+        panel = panelObject.GetComponent<BasePanel>();
+        panelDict.Add(name, panel);
+        panel.OpenPanel(name);
+        return panel;
+    }
+    public bool ClosePanel(string name)
+    {
+        BasePanel panel = null;
+        if(!panelDict.TryGetValue(name, out panel))
+        {
+            Debug.Log("界面未打开");
+            return false;
+        }
+        panel.ClosePanel();
+        return true;
     }
 }
+
+
+
+ public class UIConst
+ {
+     public const string InventoryPanel = "InventoryPanel";
+     public const string SettingsPanel = "SsttingsPanel";
+ }
+
