@@ -2284,7 +2284,7 @@ GameObject:
   - component: {fileID: 346102552}
   - component: {fileID: 346102551}
   - component: {fileID: 346102550}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9870,14 +9870,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2904541811088233307, guid: d1fcf25707f32324ea9c619ddedce5c4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6850040823641573504, guid: d1fcf25707f32324ea9c619ddedce5c4, type: 3}
       propertyPath: textHealth
       value: 
       objectReference: {fileID: 1983182225}
     - target: {fileID: 6850040823641573504, guid: d1fcf25707f32324ea9c619ddedce5c4, type: 3}
+      propertyPath: groundCheck
+      value: 
+      objectReference: {fileID: 1453052885}
+    - target: {fileID: 6850040823641573504, guid: d1fcf25707f32324ea9c619ddedce5c4, type: 3}
+      propertyPath: maxJumpCount
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6850040823641573504, guid: d1fcf25707f32324ea9c619ddedce5c4, type: 3}
       propertyPath: sliderHealth
       value: 
       objectReference: {fileID: 146561148}
+    - target: {fileID: 6850040823641573504, guid: d1fcf25707f32324ea9c619ddedce5c4, type: 3}
+      propertyPath: ground.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 8622524013567749640, guid: d1fcf25707f32324ea9c619ddedce5c4, type: 3}
       propertyPath: m_Name
       value: HeroKnight
@@ -12527,6 +12543,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!4 &1453052885 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2904541811088233307, guid: d1fcf25707f32324ea9c619ddedce5c4, type: 3}
+  m_PrefabInstance: {fileID: 988342880}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1482718179
 GameObject:
   m_ObjectHideFlags: 0
