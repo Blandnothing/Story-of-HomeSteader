@@ -168,7 +168,7 @@ GameObject:
   - component: {fileID: 9210728455561507280}
   - component: {fileID: 7141622227434481794}
   - component: {fileID: 6746338345473785571}
-  - component: {fileID: 6998503480317530308}
+  - component: {fileID: 4053890229655810490}
   m_Layer: 5
   m_Name: Settings Panel
   m_TagString: Untagged
@@ -190,7 +190,7 @@ RectTransform:
   m_Children:
   - {fileID: 5765369875880129930}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -259,7 +259,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &6998503480317530308
+--- !u!114 &4053890229655810490
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -268,7 +268,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 623698553479355191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75b29179a642dec44bf10db0361ce145, type: 3}
+  m_Script: {fileID: 11500000, guid: bed89fcadbc4718419463bad1aaf9072, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1280076479673143330
@@ -3992,10 +3992,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6998503480317530308}
-        m_TargetAssemblyTypeName: SettingsPanelScript, Assembly-CSharp
-        m_MethodName: CloseSettingsPanel
-        m_Mode: 1
+      - m_Target: {fileID: 623698553479355191}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

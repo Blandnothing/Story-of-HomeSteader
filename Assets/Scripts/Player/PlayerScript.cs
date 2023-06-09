@@ -5,13 +5,6 @@ using TMPro;
 
 public class PlayerScript : MonoBehaviour
 {
-
-    [SerializeField] float m_speed = 4.0f;
-    [SerializeField] float m_jumpForce = 7.5f;
-    [SerializeField] bool m_noBlood = false;
-    [SerializeField] Slider sliderHealth;
-    [SerializeField] TextMeshProUGUI textHealth;
-
     private Animator m_animator;
     private Rigidbody2D m_body2d;
     private int m_facingDirection = 1;
@@ -24,14 +17,18 @@ public class PlayerScript : MonoBehaviour
     private float inputX;
     private float graceTimer;
     [SerializeField] float graceTime;
+    [SerializeField] float m_speed = 4.0f;
     //ÌøÔ¾
     public int maxJumpCount = 1;
     private int jumpCount;
     private bool jumpPressed;
     private bool isJump;
+    [SerializeField] float m_jumpForce = 7.5f;
     //ÉúÃü
     public float maxHealth=100;
     float currentHealth;
+    [SerializeField] Slider sliderHealth;
+    [SerializeField] TextMeshProUGUI textHealth;
 
     enum stateID
     {
@@ -88,7 +85,6 @@ public class PlayerScript : MonoBehaviour
     private void FixedUpdate()
     {
         isGround = Physics2D.OverlapCircle(groundCheck.position, 0.05f, ground);
-        Debug.Log("isGround:"+isGround);
         GroundMovement();
         Jump();
 
@@ -164,7 +160,6 @@ public class PlayerScript : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         if(currentHealth < 0)
         {
-            m_animator.SetBool("noBlood", m_noBlood);
             m_animator.SetTrigger("Death");
         }sliderHealth.value = currentHealth/maxHealth;
         textHealth.text=currentHealth.ToString()+"/"+maxHealth.ToString();

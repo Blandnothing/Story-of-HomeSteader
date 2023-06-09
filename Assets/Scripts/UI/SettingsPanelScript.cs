@@ -4,8 +4,5 @@ using UnityEngine;
 
 public class SettingsPanelScript : BasePanel
 {
-    public void CloseSettingsPanel()
-    {
-        SetActive(false);
-    }
+   
 }
