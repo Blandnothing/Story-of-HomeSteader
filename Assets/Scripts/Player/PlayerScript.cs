@@ -2,14 +2,16 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
+using DG.Tweening;
+using Cinemachine;
 
 public class PlayerScript : MonoBehaviour
 {
     private Animator m_animator;
     private Rigidbody2D m_body2d;
-    private int m_facingDirection = 1;
-    private int m_currentAttack = 0;
-    private float m_timeSinceAttack = 0.0f;
+    [SerializeField] CinemachineImpulseSource impulseSource;
+   
     //ÒÆ¶¯
     public Transform groundCheck;
     public LayerMask ground;
@@ -29,14 +31,29 @@ public class PlayerScript : MonoBehaviour
     float currentHealth;
     [SerializeField] Slider sliderHealth;
     [SerializeField] TextMeshProUGUI textHealth;
+    //¹¥»÷
+    public float attackSpeed = 1;
+    bool isAttack;
+    public float attackBehind=0.2f;
+    private int m_currentAttack = 0;
+    private float m_timeSinceAttack = 0.0f;
+    [SerializeField] float attackShakeTime;
+    [SerializeField] float attackShakeStrength;
 
-    enum stateID
-    {
+    //ÒôÐ§
+    [SerializeField] AudioClip moveSoundClip1;   //11
+    [SerializeField] AudioClip moveSoundClip2;   //12
+    [SerializeField] AudioClip attackSoundClip1; //21
+    [SerializeField] AudioClip attackSoundClip2; //22
+    [SerializeField] AudioClip attackSoundClip3; //23
+    [SerializeField] AudioClip deathSoundClip; //3
+    [SerializeField] AudioClip jumpSoundClip;  //4
+    [SerializeField] AudioClip jumpLandSoundClip; //5
+    [SerializeField] AudioClip hitSoundClip;  //6
+    [SerializeField] AudioClip swordHitSoundClip;  //7
+    
 
-    }
 
-
-    // Use this for initialization
     void Start()
     {
         m_animator = GetComponent<Animator>();
@@ -45,41 +62,23 @@ public class PlayerScript : MonoBehaviour
         textHealth.text = currentHealth.ToString() + "/" + maxHealth.ToString();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Increase timer that controls attack combo
         m_timeSinceAttack += Time.deltaTime;
 
-        // -- Handle input and movement --
         inputX = Input.GetAxis("Horizontal");
 
-        // Swap direction of sprite depending on walk direction
         
 
         if (Input.GetButtonDown("Jump") && jumpCount>0)
         {
             jumpPressed=true;
         }
-       // --Handle Animations--
 
-        if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f)
+        if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !isAttack)
         {
-            m_currentAttack++;
-
-            // Loop back to one after third attack
-            if (m_currentAttack > 3)
-                m_currentAttack = 1;
-
-            // Reset Attack combo if time since last attack is too large
-            if (m_timeSinceAttack > 1.0f)
-                m_currentAttack = 1;
-
-            // Call one of three attack animations "Attack1", "Attack2", "Attack3"
-            m_animator.SetTrigger("Attack" + m_currentAttack);
-
-            // Reset timer
-            m_timeSinceAttack = 0.0f;
+            StopCoroutine(Attack());
+            StartCoroutine(Attack());
         }
     }
     private void FixedUpdate()
@@ -92,17 +91,22 @@ public class PlayerScript : MonoBehaviour
     }
     void GroundMovement()
     {
-        m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
+        if (isAttack)
+        {
+            m_body2d.velocity = new Vector2(transform.localScale.x * attackSpeed, m_body2d.velocity.y);
+        }
+        else
+        {
+            m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
+        }
         if (inputX > 0)
         {
-            GetComponent<SpriteRenderer>().flipX = false;
-            m_facingDirection = 1;
+            transform.localScale = new Vector2(1, 1);
         }
 
         else if (inputX < 0)
         {
-            GetComponent<SpriteRenderer>().flipX = true;
-            m_facingDirection = -1;
+            transform.localScale = new Vector2(-1, 1);
         }
     }
     void Jump()
@@ -117,8 +121,14 @@ public class PlayerScript : MonoBehaviour
         {
             graceTimer-=Time.fixedDeltaTime;
         }
-        if(jumpPressed && (isGround  || graceTimer>0))
+        if (isAttack)
         {
+            jumpPressed = false;
+            return;
+        }
+        if (jumpPressed && (isGround  || graceTimer>0))
+        {
+            PlayMoveSound(4);
             isJump = true;
             m_body2d.velocity = new Vector2(m_body2d.velocity.x, m_jumpForce);
             jumpCount--;
@@ -126,16 +136,55 @@ public class PlayerScript : MonoBehaviour
             graceTimer = 0;
         }else if(jumpPressed && jumpCount > 0 && isJump)
         {
+            PlayMoveSound(4);
             m_body2d.velocity = new Vector2(m_body2d.velocity.x, m_jumpForce);
             jumpCount--;
             jumpPressed = false;
         } 
+    }
+    IEnumerator  Attack()
+    {
+        float startTime=Time.time;
+        isAttack = true;
+
+        m_currentAttack++;
+        if (m_currentAttack > 3)
+            m_currentAttack = 1;
+        if (m_timeSinceAttack > 1.0f)
+            m_currentAttack = 1;
+        m_animator.SetTrigger("Attack" + m_currentAttack);
+        m_timeSinceAttack = 0.0f;
+
+       
+
+        while(Time.time - startTime < attackBehind)
+        {
+            if(Time.time-startTime>attackBehind-0.05f)
+                isAttack = false;
+            m_body2d.velocity = Vector2.zero;
+            yield return  null; 
+        }
+
+
+        isAttack = false;
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enermy"))
+        {
+            PlayMoveSound(7);
+            other.GetComponent<EnermyBaseScript>().GetHit(transform.localScale);
+        }
     }
     void SwitchAnim()
     {
         m_animator.SetFloat("SpeedX",Mathf.Abs(inputX));
         if (isGround)
         {
+            if (m_animator.GetCurrentAnimatorStateInfo(0).IsName("Fall"))
+            {
+                PlayMoveSound(5);
+            }
             m_animator.SetBool("Falling", false);
             m_body2d.gravityScale = 1;
         }        
@@ -165,4 +214,43 @@ public class PlayerScript : MonoBehaviour
         textHealth.text=currentHealth.ToString()+"/"+maxHealth.ToString();
     }
 
+    void PlayMoveSound(int num)
+    {
+        switch (num)
+        {
+            case 11:
+                MusicManager.Instance.PlaySound(moveSoundClip1);
+                break;
+            case 12:
+                MusicManager.Instance.PlaySound(moveSoundClip2);
+                break;
+            case 21:
+                MusicManager.Instance.PlaySound(attackSoundClip1);
+                break;
+            case 22:
+                MusicManager.Instance.PlaySound(attackSoundClip2);
+                break;
+            case 23:
+                MusicManager.Instance.PlaySound(attackSoundClip3);
+                break;
+            case 3:
+                MusicManager.Instance.PlaySound(deathSoundClip);
+                break;
+            case 4:
+                MusicManager.Instance.PlaySound(jumpSoundClip);
+                break;
+            case 5:
+                MusicManager.Instance.PlaySound(jumpLandSoundClip);
+                break;
+            case 6:
+                MusicManager.Instance.PlaySound(hitSoundClip);
+                break;
+            case 7:
+                MusicManager.Instance.PlaySound(swordHitSoundClip);
+                break;
+            default:
+                break;
+        }
+        
+    }
 }

@@ -12,4 +12,13 @@ public class InventoryGridScript : MonoBehaviour
         } }
     [SerializeField] Text _gridNum;
     public Text GridNum { get { return _gridNum; } }
+    [SerializeField] Text infoText;
+    private void Awake()
+    {
+        infoText = GameObject.Find("InfoText").GetComponent<Text>();
+    }
+    public void DisplayItemInfo()
+    {
+        infoText.text = gridItem.itemInfo;
+    }
 }

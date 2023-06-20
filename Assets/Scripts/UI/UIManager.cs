@@ -19,15 +19,15 @@ public class UIManager
     {
         get
         {
-            if(_uiRoot == null)
+            if (_uiRoot == null)
             {
-                if (GameObject.Find("DontDestroyObject"))
+                if (GameObject.Find("StartDontDestroyObject"))
                 {
-                    _uiRoot = GameObject.Find("DontDestroyObject").transform;
+                    _uiRoot = GameObject.Find("StartDontDestroyObject").transform;
                 }
                 else
                 {
-                    _uiRoot = new GameObject("DontDestroyObject").transform;
+                    _uiRoot = new GameObject("StartDontDestroyObject").transform;
                 }
             }
             return _uiRoot;
@@ -67,17 +67,17 @@ public class UIManager
             return null;
         }
 
-        GameObject panelPrefab = null;
+        GameObject panelPrefab;
         //使用缓存预制件
         if(!prefabDict.TryGetValue(name,out panelPrefab))
         {
             string realPath = "Prefabs/"+path;
-            panelPrefab = Resources.Load<GameObject>(realPath) as GameObject;
+            panelPrefab = Resources.Load<GameObject>(realPath);
             prefabDict.Add(name, panelPrefab);
         }
 
         //打开界面
-        GameObject panelObject = GameObject.Instantiate(panelPrefab, UIRoot, true);
+        GameObject panelObject = GameObject.Instantiate(panelPrefab,UIRoot,false);
         panel = panelObject.GetComponent<BasePanel>();
         panelDict.Add(name, panel);
         panel.OpenPanel(name);
@@ -94,13 +94,35 @@ public class UIManager
         panel.ClosePanel();
         return true;
     }
+    public void AddPanel(GameObject panel)
+    {
+        string path = "";
+        //检查路径是否已配置
+        if (!pathDict.TryGetValue(panel.name, out path))
+        {
+            Debug.Log("界面名称错误" + panel.name);
+            return;
+        }
+
+        GameObject panelPrefab;
+        //使用缓存预制件
+        if (!prefabDict.TryGetValue(panel.name, out panelPrefab))
+        {
+            string realPath = "Prefabs/" + path;
+            panelPrefab = Resources.Load<GameObject>(realPath);
+            prefabDict.Add(panel.name, panelPrefab);
+        }
+        //添加界面
+        panelDict.Add(panel.name, panel.GetComponent<BasePanel>());
+        return;
+    }
 }
 
 
 
  public class UIConst
  {
-     public const string InventoryPanel = "InventoryPanel";
-     public const string SettingsPanel = "SsttingsPanel";
+     public const string InventoryPanel = "Inventory Panel";
+     public const string SettingsPanel = "Settings Panel";
  }
 

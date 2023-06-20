@@ -11,14 +11,16 @@ public class PlayerMenuCanvasScript : BasePanel
     }
     public void ChangeInventoryPanel()
     {
+
         if (UIManager.Instance.panelDict.ContainsKey(UIConst.InventoryPanel))
+            UIManager.Instance.panelDict[UIConst.InventoryPanel].SetActive(!UIManager.Instance.panelDict[UIConst.InventoryPanel].isActiveAndEnabled);
+        else if (GameObject.Find("UI").transform.Find(UIConst.InventoryPanel))
         {
-            if(UIManager.Instance.panelDict[UIConst.InventoryPanel].isActiveAndEnabled)
-                UIManager.Instance.panelDict[UIConst.InventoryPanel].SetActive(false);
-            else
-                UIManager.Instance.panelDict[UIConst.InventoryPanel].SetActive(true);
+            UIManager.Instance.AddPanel(GameObject.Find("UI").transform.Find(UIConst.InventoryPanel).gameObject);
+            UIManager.Instance.panelDict[UIConst.InventoryPanel].SetActive(!UIManager.Instance.panelDict[UIConst.InventoryPanel].isActiveAndEnabled);
         }
         else
             UIManager.Instance.OpenPanel(UIConst.InventoryPanel);
     }
+    
 }
