@@ -30,6 +30,6 @@ public class MessageBoxScript : MonoBehaviour
     IEnumerator FadeMessage()
     {
         yield return new WaitForSeconds(time);
-        canvasGroup.DOFade(0, 5);
+        canvasGroup.DOFade(0, time);
     }
 }

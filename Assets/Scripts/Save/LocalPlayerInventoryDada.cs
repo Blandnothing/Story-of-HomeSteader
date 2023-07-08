@@ -11,7 +11,11 @@ public class LocalPlayerInventoryDada
         {
             System.IO.Directory.CreateDirectory(Application.persistentDataPath);
         }
-        string jsonData = JsonConvert.SerializeObject(playerInventoryManager);
+        if (!File.Exists(Application.persistentDataPath + string.Format("/SaveData")))
+        {
+            System.IO.Directory.CreateDirectory(Application.persistentDataPath + string.Format("/SaveData"));
+        }
+        string jsonData = JsonConvert.SerializeObject(playerInventoryManager,new JsonSerializerSettings{ ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
         File.WriteAllText(Application.persistentDataPath + string.Format("/SaveData/InventoryData.json"), jsonData);
     }
     public static PlayerInventoryManager LoadInventoryData()

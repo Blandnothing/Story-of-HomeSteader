@@ -13,8 +13,6 @@ public class InventoryDisplayScript : BasePanel
     [SerializeField] GameObject m_Inventory;
     override protected void Awake()
     {
-        if (instance!=null)
-          Destroy(this); 
         instance = this;
     }
     private void OnEnable()
@@ -40,5 +38,17 @@ public class InventoryDisplayScript : BasePanel
         }
     }
 
-    
+    public void OpenSettingsPanel()
+    {
+
+        if (UIManager.Instance.panelDict.ContainsKey(UIConst.SettingsPanel))
+            UIManager.Instance.panelDict[UIConst.SettingsPanel].SetActive(true);
+        else if (GameObject.Find("UI").transform.Find(UIConst.SettingsPanel))
+        {
+            UIManager.Instance.AddPanel(GameObject.Find("UI").transform.Find(UIConst.SettingsPanel).gameObject);
+            UIManager.Instance.panelDict[UIConst.SettingsPanel].SetActive(true);
+        }
+        else
+            UIManager.Instance.OpenPanel(UIConst.SettingsPanel);
+    }
 }

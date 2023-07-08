@@ -116,6 +116,10 @@ public class UIManager
         panelDict.Add(panel.name, panel.GetComponent<BasePanel>());
         return;
     }
+    public void Clear()
+    {
+        panelDict=new Dictionary<string, BasePanel>();
+    }
 }
 
 

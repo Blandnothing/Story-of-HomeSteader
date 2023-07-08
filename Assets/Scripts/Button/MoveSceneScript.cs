@@ -5,8 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class MoveSceneScript : MonoBehaviour
 {
+    public int numScene;
     public void MoveToMainTown()
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(numScene);
+        UIManager.Instance.Clear();
     }
 }

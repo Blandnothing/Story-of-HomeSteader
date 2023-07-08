@@ -6,21 +6,21 @@ using UnityEngine.Audio;
 public class MainConfigManagerScript : MonoBehaviour
 {
     static LocalConfig.Configdata configData;
-    static bool isCreated=false;
+    //static bool isCreated=false;
     [SerializeField] AudioMixer audioMixer;
 
     private void Awake()
     {
-        if (isCreated)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        //if (isCreated)
+        //{
+        //    Destroy(gameObject);
+        //    return;
+        //}
         if (LocalConfig.LoadConfigData() == null)
             LocalConfig.SaveConfigData(new LocalConfig.Configdata(1, 1, 1, false));
         configData = LocalConfig.LoadConfigData();
         ChangeAll();
-        isCreated = true;
+        //isCreated = true;
     }
     public void ChangeSoundVolume(float soundVolume)
     {

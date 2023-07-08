@@ -4,6 +4,11 @@ using UnityEngine.SceneManagement;
 public class MainMenuPanelScript : BasePanel
 {
     [SerializeField] PlayerMenuCanvasScript playerMenu;
+    [SerializeField] AudioClip musicMenu;
+    void Start()
+    {
+        MusicManager.Instance.PlayMusic(musicMenu);
+    }
     public void OpenSettingsPanel()
     {
         
@@ -19,7 +24,7 @@ public class MainMenuPanelScript : BasePanel
     }
     public void PlayGame()
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(2);
         playerMenu.SetActive(true);
     }
 }

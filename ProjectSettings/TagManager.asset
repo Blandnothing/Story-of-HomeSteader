@@ -17,10 +17,10 @@ TagManager:
   - CameraConfiner
   - ground
   - Enermy
-  - 
-  - 
-  - 
-  - 
+  - invincible
+  - damage
+  - interact
+  - background
   - 
   - 
   - 

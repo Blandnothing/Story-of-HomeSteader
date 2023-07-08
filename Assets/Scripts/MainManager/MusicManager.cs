@@ -18,8 +18,13 @@ public class MusicManager : MonoBehaviour
     {
         soundSource.PlayOneShot(audioClip);
     }
+    public void PlaySound(AudioClip audioClip,float volume)
+    {
+        soundSource.PlayOneShot(audioClip,volume);
+    }
     public void PlayMusic(AudioClip audioClip)
     {
+        musicSource.Pause();
         musicSource.clip = audioClip;
         musicSource.Play();
     }

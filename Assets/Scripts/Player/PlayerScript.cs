@@ -5,7 +5,10 @@ using TMPro;
 using UnityEngine.Events;
 using DG.Tweening;
 using Cinemachine;
+using UnityEngine.SceneManagement;
+using Newtonsoft.Json;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class PlayerScript : MonoBehaviour
 {
     private Animator m_animator;
@@ -19,26 +22,31 @@ public class PlayerScript : MonoBehaviour
     private float inputX;
     private float graceTimer;
     [SerializeField] float graceTime;
-    [SerializeField] float m_speed = 4.0f;
+    [JsonProperty] [SerializeField] float m_speed = 4.0f;
     //ÌøÔ¾
-    public int maxJumpCount = 1;
+    [JsonProperty] public int maxJumpCount = 2;
     private int jumpCount;
     private bool jumpPressed;
     private bool isJump;
     [SerializeField] float m_jumpForce = 7.5f;
     //ÉúÃü
-    public float maxHealth=100;
-    float currentHealth;
+    [JsonProperty] public float maxHealth=100;
+    [JsonProperty] float currentHealth;
     [SerializeField] Slider sliderHealth;
     [SerializeField] TextMeshProUGUI textHealth;
+    bool isDeath;
     //¹¥»÷
-    public float attackSpeed = 1;
+    [JsonProperty] public float attackPower = 5;
+    [JsonProperty] public float criticalRate = 0.05f;
+    [JsonProperty] public float criticalDamage = 0.5f;
+    [JsonProperty] public float attackSpeed = 1;
+    public float invincibleTime;
     bool isAttack;
     public float attackBehind=0.2f;
     private int m_currentAttack = 0;
     private float m_timeSinceAttack = 0.0f;
-    [SerializeField] float attackShakeTime;
-    [SerializeField] float attackShakeStrength;
+    //½»»¥
+    [HideInInspector] public bool isInteracted;
 
     //ÒôÐ§
     [SerializeField] AudioClip moveSoundClip1;   //11
@@ -59,11 +67,19 @@ public class PlayerScript : MonoBehaviour
         m_animator = GetComponent<Animator>();
         m_body2d = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
+        if (sliderHealth==null)
+        {
+            Transform healthPanel = GameObject.Find("HealthPanel").transform;
+            sliderHealth = healthPanel.Find("Slider").gameObject.GetComponent<Slider>();
+            textHealth=healthPanel.Find("Text").gameObject.GetComponent<TextMeshProUGUI>();
+        }
         textHealth.text = currentHealth.ToString() + "/" + maxHealth.ToString();
     }
 
     void Update()
     {
+        if (isDeath) return;
+
         m_timeSinceAttack += Time.deltaTime;
 
         inputX = Input.GetAxis("Horizontal");
@@ -79,6 +95,10 @@ public class PlayerScript : MonoBehaviour
         {
             StopCoroutine(Attack());
             StartCoroutine(Attack());
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            isInteracted=true;
         }
     }
     private void FixedUpdate()
@@ -173,7 +193,7 @@ public class PlayerScript : MonoBehaviour
         if (other.CompareTag("Enermy"))
         {
             PlayMoveSound(7);
-            other.GetComponent<EnermyBaseScript>().GetHit(transform.localScale);
+            other.GetComponent<EnermyBaseScript>().GetHit(transform.localScale,attackPower,criticalRate,criticalDamage);
         }
     }
     void SwitchAnim()
@@ -200,15 +220,18 @@ public class PlayerScript : MonoBehaviour
             m_body2d.gravityScale = 2;
         }
     }
-    public void changeHealth(float amount)
+    public void ChangeHealth(float amount)
     {
         if (amount<0)
         {
             m_animator.SetTrigger("Hurt");
+            StopCoroutine(Invincible());
+            StartCoroutine(Invincible());
         }
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-        if(currentHealth < 0)
+        if(currentHealth <= 0)
         {
+            isDeath = true;
             m_animator.SetTrigger("Death");
         }sliderHealth.value = currentHealth/maxHealth;
         textHealth.text=currentHealth.ToString()+"/"+maxHealth.ToString();
@@ -252,5 +275,27 @@ public class PlayerScript : MonoBehaviour
                 break;
         }
         
+    }
+    IEnumerator Invincible()
+    {
+        gameObject.layer = LayerMask.NameToLayer("invincible");
+        yield return new WaitForSeconds(invincibleTime);
+        gameObject.layer = LayerMask.NameToLayer("player");
+    } 
+    void Death()
+    {
+        SceneManager.LoadScene(0);
+    }
+    public void UpdateInfo(LocalPlayerData.PlayerData.PlayerInfo player)
+    {
+        maxHealth=player.maxHealth;
+        currentHealth = player.currentHealth;
+        attackPower = player.attackPower;
+        criticalDamage = player.criticalDamage;
+        criticalRate = player.criticalRate;
+    }
+    public LocalPlayerData.PlayerData.PlayerInfo GetPlayerInfo()
+    {
+        return new LocalPlayerData.PlayerData.PlayerInfo(maxHealth, currentHealth, attackPower, criticalDamage, criticalRate);  
     }
 }
